@@ -5,6 +5,7 @@
  */
 package B_servlets;
 
+import HelperClasses.Member;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -12,6 +13,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -24,17 +33,62 @@ public class ECommerce_GetMember extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        HttpSession session = request.getSession();
         
-        try{
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            
-        }
-        catch(Exception Ex){
-            
+        try {
+            String email = (String) session.getAttribute("memberEmail");
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target("http://localhost:8080/IS3102_WebService-Student/webresources/entity.memberentity")
+                    .path("member")
+                    .queryParam("email", email);
+
+            Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_JSON);
+            Response res = invocationBuilder.get();
+            if (res.getStatus() == 200) {
+                Member member = res.readEntity(new GenericType<Member>() {
+                });
+                session.setAttribute("member", member);
+                session.setAttribute("memberName", member.getName());
+                response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
+                out.println(member.getName());
+                out.println(member.getCity());
+            }else{
+                out.println("Error!");
+            }
+            //it is working do not change :p
+//        try {
+//            String email = request.getParameter("email");
+//            String password = request.getParameter("password");
+//
+//            HttpSession session = request.getSession();
+//            Member member = getMemberRESTful(email);
+//            out.print(member);
+//            session.setAttribute("member", member);
+//            session.setAttribute("memberName","superman");
+//            
+//            response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
+        } catch (Exception Ex) {
+            out.println(Ex);
+            Ex.printStackTrace();
         }
     }
 
+    private Member getMemberRESTful(String email) {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("http://localhost:8080/IS3102_WebService-Student/webresources/entity.memberentity")
+                .path("member")
+                .queryParam("email", email);
+
+        Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_JSON);
+        Response res = invocationBuilder.get();
+        if (res.getStatus() == 200) {
+            Member member = res.readEntity(new GenericType<Member>() {
+            });
+            return member;
+        } else {
+            return null;
+        }
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

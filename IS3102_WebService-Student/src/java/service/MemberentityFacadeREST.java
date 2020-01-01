@@ -33,6 +33,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -84,6 +85,42 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
         List<Memberentity> list2 = new ArrayList();
         list2.add(list.get(0));
         return list;
+    }
+    
+    @GET
+    @Path("member")
+    @Produces({"application/json"})
+    public Response MemberProfile(@QueryParam("email") String email) {
+        
+        Member member = new Member();
+        
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+            String stmt = "SELECT * FROM memberentity m WHERE m.EMAIL=?";
+            PreparedStatement ps = conn.prepareStatement(stmt);
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                member.setId(rs.getLong("ID"));
+                member.setName(rs.getString("NAME"));
+                member.setEmail(rs.getString("EMAIL"));
+                member.setAge(rs.getInt("AGE"));
+                member.setPhone(rs.getString("PHONE"));
+                member.setAddress(rs.getString("ADDRESS"));
+                member.setCity(rs.getString("CITY"));
+                member.setIncome(rs.getInt("INCOME"));
+                member.setSecurityQuestion(rs.getInt("SECURITYQUESTION"));
+                member.setSecurityAnswer(rs.getString("SECURITYANSWER"));
+                
+                GenericEntity<Member> entity = new GenericEntity<Member>(member){};
+                
+                return Response.status(200).entity(entity).build();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return null;
     }
 
     //this function is used by ECommerce_MemberLoginServlet
