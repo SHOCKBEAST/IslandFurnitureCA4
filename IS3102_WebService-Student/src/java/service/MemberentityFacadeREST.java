@@ -86,14 +86,47 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
         list2.add(list.get(0));
         return list;
     }
-    
+
+    @PUT
+    @Path("memberUpdate")
+    @Consumes({"application/xml", "application/json"})
+    public Response memberUpdate(@QueryParam("name") String name, @QueryParam("phone") String phone,
+            @QueryParam("address") String address, @QueryParam("securityQuestion") int securityQuestion,
+            @QueryParam("securityAnswer") String securityAnswer, @QueryParam("age") int age,
+            @QueryParam("income") int income, @QueryParam("email") String email) {
+
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+            String stmt = "UPDATE memberentity m SET m.NAME=? , m.PHONE=? , m.ADDRESS=? , m.SECURITYQUESTION=? , m.SECURITYANSWER=? , m.AGE=? , m.INCOME=? WHERE m.EMAIL=?";
+            PreparedStatement ps = conn.prepareStatement(stmt);
+            ps.setString(1, name);
+            ps.setString(2, phone);
+            ps.setString(3, address);
+            ps.setInt(4, securityQuestion);
+            ps.setString(5, securityAnswer);
+            ps.setInt(6, age);
+            ps.setInt(7, income);
+            ps.setString(8, email);
+
+            int result = ps.executeUpdate();
+            if (result == 1) {
+                return Response.status(204).entity("Updated").build();
+            } else {
+                return Response.status(422).entity("Update Failed").build();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Response.status(422).entity(ex).build();
+        }
+    }
+
     @GET
     @Path("member")
     @Produces({"application/json"})
-    public Response MemberProfile(@QueryParam("email") String email) {
-        
+    public Response memberProfile(@QueryParam("email") String email) {
+
         Member member = new Member();
-        
+
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
             String stmt = "SELECT * FROM memberentity m WHERE m.EMAIL=?";
@@ -111,9 +144,10 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
                 member.setIncome(rs.getInt("INCOME"));
                 member.setSecurityQuestion(rs.getInt("SECURITYQUESTION"));
                 member.setSecurityAnswer(rs.getString("SECURITYANSWER"));
-                
-                GenericEntity<Member> entity = new GenericEntity<Member>(member){};
-                
+
+                GenericEntity<Member> entity = new GenericEntity<Member>(member) {
+                };
+
                 return Response.status(200).entity(entity).build();
             }
         } catch (Exception ex) {

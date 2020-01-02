@@ -34,6 +34,7 @@ public class ECommerce_GetMember extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         HttpSession session = request.getSession();
+        String result = request.getParameter("goodMsg");
         
         try {
             String email = (String) session.getAttribute("memberEmail");
@@ -49,7 +50,12 @@ public class ECommerce_GetMember extends HttpServlet {
                 });
                 session.setAttribute("member", member);
                 session.setAttribute("memberName", member.getName());
-                response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
+                if(result != null){
+                response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp?goodMsg=Account updated successfully.");
+                }
+                else{
+                    response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
+                }
                 out.println(member.getName());
                 out.println(member.getCity());
             }else{
