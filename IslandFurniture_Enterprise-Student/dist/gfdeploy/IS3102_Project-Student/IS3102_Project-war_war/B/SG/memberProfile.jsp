@@ -92,7 +92,7 @@
                                             <label>Country</label>
                                             <%if (member.getCity() != null && member.getCity() != "") {%>
                                             <select name="country" disabled>
-                                                <option value="<%=member.getCity()%>"><%=member.getCity()%></option>
+                                                <option value="<%=member.getCity()%>" selected="selected"><%=member.getCity()%></option>
                                                 <%} else {%>
                                                 <select name="country">
                                                     <%}%>
@@ -384,7 +384,7 @@
                                             <input class="form-control" name="income" step="1" type="number" min="0" max="2147483646" value="<%=member.getIncome()%>">
                                         </div>
                                         <div class="form-group">
-                                            <input type="checkbox" name="serviceLevelAgreement"> Allow us to use your particulars to serve you better?<br/>Checking the box above indicates that you agree to our <a onclick="pdpaWindow()">personal data protection policy.</a>
+                                            <input type="checkbox" name="serviceLevelAgreement" <%=member.getServiceLevelAgreement() == 1 ? "checked='checked'" : "" %> value="1"/> Allow us to use your particulars to serve you better?<br/>Checking the box above indicates that you agree to our <a onclick="pdpaWindow()">personal data protection policy.</a>
                                         </div>
                                         <hr class="more-spaced "/>
                                         <h4>Change Password</h4>

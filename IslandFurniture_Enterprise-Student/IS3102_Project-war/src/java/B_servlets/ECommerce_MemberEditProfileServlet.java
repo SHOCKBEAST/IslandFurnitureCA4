@@ -41,14 +41,24 @@ public class ECommerce_MemberEditProfileServlet extends HttpServlet {
             String email = (String) session.getAttribute("memberEmail");
             String name = request.getParameter("name");
             String phone = request.getParameter("phone");
+            String city = request.getParameter("country");
             String address = request.getParameter("address");
             int securityQuestion = Integer.parseInt(request.getParameter("securityQuestion"));
             String securityAnswer = request.getParameter("securityAnswer");
             int age = Integer.parseInt(request.getParameter("age"));
             int income = Integer.parseInt(request.getParameter("income"));
-
-            String result = updateMemberRESTful(name, phone, address, securityQuestion, securityAnswer, age, income, email);
-            out.print(result);
+            String password = request.getParameter("password");
+            String repassword = request.getParameter("repassword");
+            String serviceLevelAgreementStr = request.getParameter("serviceLevelAgreement");
+            int serviceLevelAgreement = 0;
+            
+            if(serviceLevelAgreementStr != null){
+                serviceLevelAgreement = 1;
+            }
+            
+            String result = updateMemberRESTful(name, phone, city, address, securityQuestion,
+                    securityAnswer, age, income, serviceLevelAgreement, password, repassword, email);
+            out.println(result);
 
 //            out.print("-------");
 //            out.println(name);
@@ -56,8 +66,9 @@ public class ECommerce_MemberEditProfileServlet extends HttpServlet {
 //            //out.println(phone);
 //            //out.println(address);
 //            out.println(securityQuestion);
-//            out.println(securityAnswer);
-//            out.println(age);
+            //out.println(password);
+            //out.println(repassword);
+            out.println(city);
             
             if (result == "Updated") {
                 
@@ -72,19 +83,25 @@ public class ECommerce_MemberEditProfileServlet extends HttpServlet {
         }
     }
 
-    private String updateMemberRESTful(String name, String phone, String address, 
-            int securityQuestion, String securityAnswer, int age, int income, String email) {
+    private String updateMemberRESTful(String name, String phone, String city,
+            String address, int securityQuestion, String securityAnswer,
+            int age, int income,int serviceLevelAgreement, String password,
+            String repassword, String email) {
         
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target("http://localhost:8080/IS3102_WebService-Student/webresources/entity.memberentity")
                 .path("memberUpdate")
                 .queryParam("name", name)
                 .queryParam("phone", phone)
+                .queryParam("city", city)
                 .queryParam("address", address)
                 .queryParam("securityQuestion", securityQuestion)
                 .queryParam("securityAnswer", securityAnswer)
                 .queryParam("age", age)
                 .queryParam("income", income)
+                .queryParam("serviceLevelAgreement", serviceLevelAgreement)
+                .queryParam("password", password)
+                .queryParam("repassword", repassword)
                 .queryParam("email", email);
 
         Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_JSON);

@@ -17,6 +17,15 @@ public class Member {
     private String securityAnswer;
     private Integer age;
     private Integer income;
+    private Integer serviceLevelAgreement;
+    
+    public Integer getServiceLevelAgreement() {
+        return serviceLevelAgreement;
+    }
+
+    public void setServiceLevelAgreement(Integer serviceLevelAgreement) {
+        this.serviceLevelAgreement = serviceLevelAgreement;
+    }
 
     public Long getId() {
         return id;

@@ -91,22 +91,43 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
     @Path("memberUpdate")
     @Consumes({"application/xml", "application/json"})
     public Response memberUpdate(@QueryParam("name") String name, @QueryParam("phone") String phone,
-            @QueryParam("address") String address, @QueryParam("securityQuestion") int securityQuestion,
+            @QueryParam("city") String city, @QueryParam("address") String address,
+            @QueryParam("securityQuestion") int securityQuestion,
             @QueryParam("securityAnswer") String securityAnswer, @QueryParam("age") int age,
-            @QueryParam("income") int income, @QueryParam("email") String email) {
+            @QueryParam("income") int income, @QueryParam("serviceLevelAgreement") int serviceLevelAgreement, 
+            @QueryParam("password") String password, @QueryParam("repassword") String repassword,
+            @QueryParam("email") String email) {
 
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
-            String stmt = "UPDATE memberentity m SET m.NAME=? , m.PHONE=? , m.ADDRESS=? , m.SECURITYQUESTION=? , m.SECURITYANSWER=? , m.AGE=? , m.INCOME=? WHERE m.EMAIL=?";
+            String stmt = "UPDATE memberentity m SET m.NAME=? , m.PHONE=? , m.CITY=? , m.ADDRESS=? , m.SECURITYQUESTION=? , m.SECURITYANSWER=? , m.AGE=? , m.INCOME=?, m.SERVICELEVELAGREEMENT=? ";
+            
+            if(password != null && !"".equals(password)){
+                stmt += ", m.PASSWORDSALT=? , m.PASSWORDHASH=? WHERE m.EMAIL=?";
+            }else{
+                stmt += "WHERE m.EMAIL=?";
+            }
+            
             PreparedStatement ps = conn.prepareStatement(stmt);
             ps.setString(1, name);
             ps.setString(2, phone);
-            ps.setString(3, address);
-            ps.setInt(4, securityQuestion);
-            ps.setString(5, securityAnswer);
-            ps.setInt(6, age);
-            ps.setInt(7, income);
-            ps.setString(8, email);
+            ps.setString(3, city);
+            ps.setString(4, address);
+            ps.setInt(5, securityQuestion);
+            ps.setString(6, securityAnswer);
+            ps.setInt(7, age);
+            ps.setInt(8, income);
+            ps.setInt(9, serviceLevelAgreement);
+            
+            if(password != null && !"".equals(password)){
+                String passwordSalt = generatePasswordSalt();
+                String passwordHash = generatePasswordHash(passwordSalt, password);
+                ps.setString(10, passwordSalt);
+                ps.setString(11, passwordHash);
+                ps.setString(12, email);
+            }else{
+                ps.setString(10, email);
+            }
 
             int result = ps.executeUpdate();
             if (result == 1) {
@@ -144,6 +165,7 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
                 member.setIncome(rs.getInt("INCOME"));
                 member.setSecurityQuestion(rs.getInt("SECURITYQUESTION"));
                 member.setSecurityAnswer(rs.getString("SECURITYANSWER"));
+                member.setServiceLevelAgreement(rs.getInt("SERVICELEVELAGREEMENT"));
 
                 GenericEntity<Member> entity = new GenericEntity<Member>(member) {
                 };
