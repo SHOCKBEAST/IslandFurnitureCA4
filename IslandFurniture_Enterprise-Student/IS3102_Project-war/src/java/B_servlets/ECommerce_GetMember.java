@@ -36,43 +36,45 @@ public class ECommerce_GetMember extends HttpServlet {
         HttpSession session = request.getSession();
         String result = request.getParameter("goodMsg");
         
+//        try {
+//            String email = (String) session.getAttribute("memberEmail");
+//            Client client = ClientBuilder.newClient();
+//            WebTarget target = client.target("http://localhost:8080/IS3102_WebService-Student/webresources/entity.memberentity")
+//                    .path("member")
+//                    .queryParam("email", email);
+//
+//            Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_JSON);
+//            Response res = invocationBuilder.get();
+//            if (res.getStatus() == 200) {
+//                Member member = res.readEntity(new GenericType<Member>() {
+//                });
+//                session.setAttribute("member", member);
+//                session.setAttribute("memberName", member.getName());
+//                if(result != null){
+//                response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp?goodMsg=Account updated successfully.");
+//                }
+//                else{
+//                    response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
+//                }
+//                out.println(member.getName());
+//                out.println(member.getCity());
+//            }else{
+//                out.println("Error!");
+//            }
         try {
             String email = (String) session.getAttribute("memberEmail");
-            Client client = ClientBuilder.newClient();
-            WebTarget target = client.target("http://localhost:8080/IS3102_WebService-Student/webresources/entity.memberentity")
-                    .path("member")
-                    .queryParam("email", email);
 
-            Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_JSON);
-            Response res = invocationBuilder.get();
-            if (res.getStatus() == 200) {
-                Member member = res.readEntity(new GenericType<Member>() {
-                });
-                session.setAttribute("member", member);
-                session.setAttribute("memberName", member.getName());
-                if(result != null){
+            Member member = getMemberRESTful(email);
+            out.print(member);
+            session.setAttribute("member", member);
+            session.setAttribute("memberName",member.getName());
+            
+            if(result != null){
                 response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp?goodMsg=Account updated successfully.");
                 }
                 else{
                     response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
                 }
-                out.println(member.getName());
-                out.println(member.getCity());
-            }else{
-                out.println("Error!");
-            }
-            //it is working do not change :p
-//        try {
-//            String email = request.getParameter("email");
-//            String password = request.getParameter("password");
-//
-//            HttpSession session = request.getSession();
-//            Member member = getMemberRESTful(email);
-//            out.print(member);
-//            session.setAttribute("member", member);
-//            session.setAttribute("memberName","superman");
-//            
-//            response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
         } catch (Exception Ex) {
             out.println(Ex);
             Ex.printStackTrace();
@@ -88,9 +90,8 @@ public class ECommerce_GetMember extends HttpServlet {
         Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_JSON);
         Response res = invocationBuilder.get();
         if (res.getStatus() == 200) {
-            Member member = res.readEntity(new GenericType<Member>() {
+            return res.readEntity(new GenericType<Member>() {
             });
-            return member;
         } else {
             return null;
         }
